@@ -33,7 +33,7 @@ def make_request(url, return_soup=True):
         r = requests.get(url, headers=headers)
     except RequestException as e:
         log("WARNING: Request for {} failed.".format(url))
-        return make_request(url)  # try request again, recursively
+        return None, None
 
     num_requests += 1
     if r.status_code != 200:

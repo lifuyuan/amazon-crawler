@@ -27,7 +27,7 @@ def crawl_categories():
     page, html = helpers.make_request(url.decode())
     if not page:
         return
-    items = page.select('#search-results .s-result-item')
+    items = page.select('.s-result-list li.s-result-item')
     if len(items) > 0:
         helpers.enqueue_items_url(url.decode())
     subcategories = page.select('.s-ref-indent-one li a')

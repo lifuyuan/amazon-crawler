@@ -5,7 +5,7 @@ current_dir = os.path.dirname(os.path.realpath(__file__))
 max_requests = 2 * 10**6  # two million
 
 # Threads
-max_threads = 200
+max_threads = 10
 
 # Max Retring Times
 max_retring_times = 5

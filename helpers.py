@@ -95,10 +95,12 @@ def get_proxy():
     try:
         valid_url = "http://www.baidu.com"
         proxy_dict = {url.split("://")[0]: url}
-        re = requests.get(valid_url, proxies=proxy_dict, timeout=2)
+        headers = settings.headers
+        headers["User-Agent"] = random.choice(settings.agents)
+        re = requests.get(valid_url, proxies=proxy_dict, headers=headers, timeout=6)
     except Exception as e:
         log("url: {} is invalid".format(url))
-        get_proxy()
+        return get_proxy()
     else:
         code = re.status_code
         if code >= 200 and code < 300:
@@ -106,7 +108,7 @@ def get_proxy():
             return proxy_dict
         else:
             log("url: {} is invalid".format(url))
-            get_proxy()
+            return get_proxy()
 
 
 def enqueue_categories_url(url):

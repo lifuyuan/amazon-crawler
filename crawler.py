@@ -1,3 +1,4 @@
+import sys
 import helpers
 import eventlet
 from datetime import datetime
@@ -106,15 +107,26 @@ def crawl_images():
     pile.spawn(crawl_images)
 
 if __name__ == "__main__":
-    # init crawl
-    #init_crawl()
-    # 爬取目录
-    helpers.log("Beginning crawl at {}".format(crawl_time))
-    #[pile.spawn(crawl_categories) for _ in range(settings.max_threads)]
-    #pool.waitall()
+    if len(sys.argv) > 1 and sys.argv[1] == "init":
+        # 初始化爬虫
+        init_crawl()
 
-    [pile.spawn(crawl_images) for _ in range(settings.max_threads)]
-    pool.waitall()
-    #cursor.close()
-    #conn.close()
+    if len(sys.argv) > 1 and sys.argv[1] == "categories":
+        # 爬取目录
+        helpers.log("Beginning crawl categories at {}".format(crawl_time))
+        [pile.spawn(crawl_categories) for _ in range(settings.max_threads)]
+        pool.waitall()
+
+    if len(sys.argv) > 1 and sys.argv[1] == "items":
+        # 爬取商品
+        helpers.log("Beginning crawl items at {}".format(crawl_time))
+        [pile.spawn(crawl_items) for _ in range(settings.max_threads)]
+        pool.waitall()
+        cursor.close()
+        conn.close()
+
+    if len(sys.argv) > 1 and sys.argv[1] == "images":
+        [pile.spawn(crawl_images) for _ in range(settings.max_threads)]
+        pool.waitall()
+
 

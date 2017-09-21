@@ -8,14 +8,17 @@ htmlparser = HTMLParser()
 
 
 def get_category(page):
-    category = ""
-    for tag in page.select("#s-result-count span a"):
-        category = "{}{}:::".format(category, tag.string)
-    last_tag = page.select("#s-result-count span")[-1]
-    if last_tag:
-        category = "{}{}".format(category, last_tag.string)
+    try:
+        category = ""
+        for tag in page.select("#s-result-count span a"):
+            category = "{}{}:::".format(category, tag.string)
+        last_tag = page.select("#s-result-count span")
+        if last_tag:
+            category = "{}{}".format(category, last_tag[-1].string)
 
-    return category
+        return category
+    except Exception as e:
+        return "<missing product category>"
 
 
 def get_title(item):
@@ -94,7 +97,7 @@ def get_primary_img(item):
 def download_img(url, category, asin):
     dir_name = "images/{}".format(category)
     if not os.path.exists(dir_name):
-        os.mkdir(dir_name)
+        os.makedirs(dir_name)
     path = "{}/{}.jpg".format(dir_name, asin)
     #with open(path, "wb") as f:
     #    f.write(requests.get(url).content)

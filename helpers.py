@@ -15,8 +15,13 @@ redis = redis.StrictRedis(host=settings.redis_host, port=settings.redis_port, db
 def make_request(url, return_soup=True):
     # 全局的url request及response处理函数
     url = format_url(url)
-    log("make_request")
-    log(url)
+    log("make_request:  "+url)
+    tring_times = redis.spop(url)
+    tring_times = int(tring_times.decode()) if tring_times else 0
+    log("tring_times: {}".format(tring_times))
+    if tring_times > settings.max_retring_times:
+        log("Tring too many times")
+        return None, None  # 超过重试次数
     if "picassoRedirect" in url:
         return None, None  # 跳过重定向的url
 
@@ -33,8 +38,9 @@ def make_request(url, return_soup=True):
         else:
             r = requests.get(url, headers=headers, timeout=20)
     except RequestException as e:
-        log("WARNING: Request for {} failed.".format(url))
-        return None, None
+        log("WARNING: Request for {} failed. Retring.....{} times".format(url, tring_times+1))
+        redis.sadd(url, str(tring_times+1))
+        return make_request(url)
 
     num_requests += 1
     if r.status_code != 200:
@@ -92,6 +98,8 @@ def get_proxy():
     url = dequeue_proxy_url()
     if not url:
         return None
+    return {url.split("://")[0]: url}
+    ''' 不在此处判断ip是否可用
     try:
         valid_url = "http://www.baidu.com"
         proxy_dict = {url.split("://")[0]: url}
@@ -109,6 +117,7 @@ def get_proxy():
         else:
             log("url: {} is invalid".format(url))
             return get_proxy()
+    '''
 
 
 def enqueue_categories_url(url):
@@ -152,7 +161,7 @@ def enqueue_proxy_url(url):
 
 
 def dequeue_proxy_url():
-    url = redis.spop("proxy_urls")
+    url = redis.srandmember("proxy_urls")
     if url:
         url = url.decode()
     return url

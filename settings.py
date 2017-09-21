@@ -7,6 +7,9 @@ max_requests = 2 * 10**6  # two million
 # Threads
 max_threads = 200
 
+# Max Retring Times
+max_retring_times = 5
+
 # Redis
 redis_host = "127.0.0.1"
 redis_port = 6379

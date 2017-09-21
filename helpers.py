@@ -16,10 +16,10 @@ def make_request(url, return_soup=True):
     # 全局的url request及response处理函数
     url = format_url(url)
     log("make_request:  "+url)
-    tring_times = redis.spop(url)
-    tring_times = int(tring_times.decode()) if tring_times else 0
-    log("tring_times: {}".format(tring_times))
-    if tring_times > settings.max_retring_times:
+    trying_times = redis.spop(url)
+    trying_times = int(trying_times.decode()) if trying_times else 0
+    log("tring_times: {}".format(trying_times))
+    if trying_times > settings.max_retrying_times:
         log("Tring too many times")
         return None, None  # 超过重试次数
     if "picassoRedirect" in url:
@@ -38,8 +38,8 @@ def make_request(url, return_soup=True):
         else:
             r = requests.get(url, headers=headers, timeout=20)
     except RequestException as e:
-        log("WARNING: Request for {} failed. Retring.....{} times".format(url, tring_times+1))
-        redis.sadd(url, str(tring_times+1))
+        log("WARNING: Request for {} failed. Retrying.....{} times".format(url, trying_times+1))
+        redis.sadd(url, str(trying_times+1))
         return make_request(url)
 
     num_requests += 1

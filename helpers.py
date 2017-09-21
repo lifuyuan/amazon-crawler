@@ -26,11 +26,12 @@ def make_request(url, return_soup=True):
 
     headers = settings.headers
     headers["User-Agent"] = random.choice(settings.agents)
-    # proxy_dict = {
-    #     "https": random.choice(settings.proxies)
-    # }
+    proxy_dict = get_proxy()
     try:
-        r = requests.get(url, headers=headers)
+        if proxy_dict:
+            r = requests.get(url, headers=headers, proxies=proxy_dict, timeout=10)
+        else:
+            r = requests.get(url, headers=headers, timeout=10)
     except RequestException as e:
         log("WARNING: Request for {} failed.".format(url))
         return None, None
@@ -72,6 +73,32 @@ def log(msg):
             pass
 
 
+def init_proxies():
+    for url in settings.proxies:
+        enqueue_proxy_url(url)
+
+
+def get_proxy():
+    url = dequeue_proxy_url()
+    if not url:
+        return None
+    try:
+        valid_url = "http://www.baidu.com"
+        proxy_dict = {"https": url}
+        re = requests.get(valid_url, proxies=proxy_dict, timeout=2)
+    except Exception as e:
+        log("url: {} is invalid".format(url))
+        get_proxy()
+    else:
+        code = re.status_code
+        if code >= 200 and code < 300:
+            enqueue_proxy_url(url)
+            return proxy_dict
+        else:
+            log("url: {} is invalid".format(url))
+            get_proxy()
+
+
 def enqueue_categories_url(url):
     url = format_url(url)
     return redis.sadd("categories_queue", url)
@@ -107,4 +134,14 @@ def dequeue_images_url():
         return image[0], image[1]
     return None, None
 
+
+def enqueue_proxy_url(url):
+    return redis.sadd("proxy_urls", url)
+
+
+def dequeue_proxy_url():
+    url = redis.spop("proxy_urls")
+    if url:
+        url = url.decode()
+    return url
 

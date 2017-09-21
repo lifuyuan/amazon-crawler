@@ -93,8 +93,16 @@ def crawl_images():
         helpers.log("WARNING: No URLs found in the queue. Retrying...")
         pile.spawn(crawl_images)
         return
-    with open(path, "wb") as f:
-        f.write(requests.get(url).content)
+    proxy_dict = helpers.get_proxy()
+    try:
+        if proxy_dict:
+            content = requests.get(url, proxies=proxy_dict, timeout=10).content
+        else:
+            content = requests.get(url, timeout=10).content
+        with open(path, "wb") as f:
+            f.write(content)
+    except Exception as e:
+        helpers.log(e)
     pile.spawn(crawl_images)
 
 if __name__ == "__main__":

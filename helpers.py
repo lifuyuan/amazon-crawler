@@ -29,9 +29,9 @@ def make_request(url, return_soup=True):
     proxy_dict = get_proxy()
     try:
         if proxy_dict:
-            r = requests.get(url, headers=headers, proxies=proxy_dict, timeout=10)
+            r = requests.get(url, headers=headers, proxies=proxy_dict, timeout=20)
         else:
-            r = requests.get(url, headers=headers, timeout=10)
+            r = requests.get(url, headers=headers, timeout=20)
     except RequestException as e:
         log("WARNING: Request for {} failed.".format(url))
         return None, None

@@ -74,8 +74,18 @@ def log(msg):
 
 
 def init_proxies():
-    for url in settings.proxies:
-        enqueue_proxy_url(url)
+    url = "https://us-proxy.org/"
+    page, html = make_request(url)
+    if not page:
+        return
+    tr_tag = page.select("table.table tbody tr")
+    if tr_tag:
+        for tag in tr_tag:
+            th_tag = tag.select("td")
+            ip = th_tag[0].string
+            port = th_tag[1].string
+            ptype = "https" if th_tag[6].string == "yes" else "http"
+            enqueue_proxy_url("{}://{}:{}".format(ptype, ip, port))
 
 
 def get_proxy():
@@ -84,7 +94,7 @@ def get_proxy():
         return None
     try:
         valid_url = "http://www.baidu.com"
-        proxy_dict = {"https": url}
+        proxy_dict = {url.split("://")[0]: url}
         re = requests.get(valid_url, proxies=proxy_dict, timeout=2)
     except Exception as e:
         log("url: {} is invalid".format(url))

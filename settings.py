@@ -13,10 +13,10 @@ redis_port = 6379
 redis_db = 0
 
 # Database
-pgs_database = "amazon_crawler"
+pgs_database = "amazon_spider"
 pgs_host = "127.0.0.1"
-pgs_user = "amazon_info"
-pgs_password = "1qaz2wsx"
+pgs_user = "fuyuan"
+pgs_password = "fuyuan"
 pgs_port = "5432"
 
 

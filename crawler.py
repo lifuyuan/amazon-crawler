@@ -3,8 +3,9 @@ import eventlet
 from datetime import datetime
 import extractors
 import settings
-from models import Product
+from models import Product, conn, cursor
 import re
+import requests
 
 crawl_time = datetime.now()
 
@@ -29,12 +30,12 @@ def crawl_categories():
         helpers.log("WARNING: No URLs found in the queue. Retrying...")
         pile.spawn(crawl_categories)
         return
-    page, html = helpers.make_request(url.decode())
+    page, html = helpers.make_request(url)
     if not page:
         return
     items = page.select('.s-result-list li.s-result-item')
     if len(items) > 0:
-        helpers.enqueue_items_url(url.decode())
+        helpers.enqueue_items_url(url)
     text_tag = page.find(text=re.compile('Show results for'))
     subcategories = page.select('.a-carousel li  .list-item__category-link')
     if text_tag:
@@ -48,7 +49,11 @@ def crawl_categories():
 
 # 商品信息爬取
 def crawl_items():
-    url = "https://www.amazon.com/s/ref=lp_10671046011_pg_2?rh=n%3A1055398%2Cn%3A%211063498%2Cn%3A1063252%2Cn%3A10671038011%2Cn%3A10671046011&page=2&ie=UTF8&qid=1505900990"
+    url = helpers.dequeue_items_url()
+    if not url:
+        helpers.log("WARNING: No URLs found in the queue. Retrying...")
+        pile.spawn(crawl_items)
+        return
     page, html = helpers.make_request(url)
     if not page:
         return
@@ -61,8 +66,7 @@ def crawl_items():
         list_url = url
         price = extractors.get_price(item)
         img_url = extractors.get_primary_img(item)
-        img_path = extractors.download_img(product_url, category.split(":::")[-1], asin)
-        helpers.log(product_url)
+        img_path = extractors.download_img(img_url, category.split(":::")[-1], asin)
         product = Product(
             category=category,
             asin=asin,
@@ -75,13 +79,34 @@ def crawl_items():
             crawl_time=datetime.now()
         )
         product.save()
+    next_link_tag = page.select("a#pagnNextLink")
+    if next_link_tag:
+        helpers.log(" Found 'Next' link on {}: {}".format(url, next_link_tag[0]["href"]))
+        helpers.enqueue_items_url(next_link_tag[0]["href"])
+        pile.spawn(crawl_items)
 
+
+# 商品图片获取
+def crawl_images():
+    path, url = helpers.dequeue_images_url()
+    if not url:
+        helpers.log("WARNING: No URLs found in the queue. Retrying...")
+        pile.spawn(crawl_images)
+        return
+    with open(path, "wb") as f:
+        f.write(requests.get(url).content)
+    pile.spawn(crawl_images)
 
 if __name__ == "__main__":
     # init crawl
-    init_crawl()
+    #init_crawl()
     # 爬取目录
-    #helpers.log("Beginning crawl at {}".format(crawl_time))
+    helpers.log("Beginning crawl at {}".format(crawl_time))
     #[pile.spawn(crawl_categories) for _ in range(settings.max_threads)]
     #pool.waitall()
+
+    [pile.spawn(crawl_images) for _ in range(settings.max_threads)]
+    pool.waitall()
+    #cursor.close()
+    #conn.close()
 

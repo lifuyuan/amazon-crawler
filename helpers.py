@@ -78,7 +78,10 @@ def enqueue_categories_url(url):
 
 
 def dequeue_categories_url():
-    return redis.spop("categories_queue")
+    url = redis.spop("categories_queue")
+    if url:
+        url = url.decode()
+    return url
 
 
 def enqueue_items_url(url):
@@ -87,5 +90,21 @@ def enqueue_items_url(url):
 
 
 def dequeue_items_url():
-    return redis.spop("items_queue")
+    url = redis.spop("items_queue")
+    if url:
+        url = url.decode()
+    return url
+
+
+def enqueue_images_url(url, path):
+    return redis.sadd("images_queue", "{}::::{}".format(path, url))
+
+
+def dequeue_images_url():
+    image = redis.spop("images_queue")
+    if image:
+        image = image.decode().split("::::")
+        return image[0], image[1]
+    return None, None
+
 

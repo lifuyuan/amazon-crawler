@@ -1,6 +1,6 @@
 from html.parser import HTMLParser
 import html
-from helpers import format_url
+from helpers import format_url, enqueue_images_url
 import requests
 import os
 
@@ -96,6 +96,8 @@ def download_img(url, category, asin):
     if not os.path.exists(dir_name):
         os.mkdir(dir_name)
     path = "{}/{}.jpg".format(dir_name, asin)
-    with open(path, "wb") as f:
-        f.write(requests.get(url).content)
+    #with open(path, "wb") as f:
+    #    f.write(requests.get(url).content)
+    # 异步获取图片
+    enqueue_images_url(url, path)
     return path

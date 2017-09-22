@@ -119,7 +119,7 @@ def crawl_images():
         #else:
         headers = settings.headers
         headers["User-Agent"] = random.choice(settings.agents)
-        content = requests.get(url, headers=headers, timeout=30).content
+        content = requests.get(url, headers=headers, timeout=60).content
         with open(path, "wb") as f:
             f.write(content)
     except Exception as e:

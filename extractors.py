@@ -96,8 +96,8 @@ def get_primary_img(item):
 
 def download_img(url, category, asin):
     dir_name = "images/{}".format(category)
-    if not os.path.exists(dir_name):
-        os.makedirs(dir_name)
+    #if not os.path.exists(dir_name):
+    #    os.makedirs(dir_name)
     path = "{}/{}.jpg".format(dir_name, asin)
     #with open(path, "wb") as f:
     #    f.write(requests.get(url).content)

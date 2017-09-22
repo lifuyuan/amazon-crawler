@@ -7,6 +7,7 @@ import settings
 from models import Product, conn, cursor
 import re
 import requests
+import os
 
 crawl_time = datetime.now()
 
@@ -55,6 +56,12 @@ def crawl_items():
         helpers.log("WARNING: No URLs found in the queue. Retrying...")
         pile.spawn(crawl_items)
         return
+    product = Product(
+        category="node",
+        list_url=url,
+        crawl_time=datetime.now()
+    )
+    product.save()
     page, html = helpers.make_request(url)
     if not page:
         return
@@ -97,6 +104,9 @@ def crawl_images():
     proxy_dict = helpers.get_proxy()
 
     try:
+        dir_name = re.match("(.*/)*", path).group(0)
+        if not os.path.exists(dir_name):
+            os.makedirs(dir_name)
         if proxy_dict:
             content = requests.get(url, proxies=proxy_dict, timeout=10).content
         else:

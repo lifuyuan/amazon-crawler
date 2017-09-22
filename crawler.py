@@ -95,6 +95,7 @@ def crawl_images():
         # pile.spawn(crawl_images)
         return
     proxy_dict = helpers.get_proxy()
+
     try:
         if proxy_dict:
             content = requests.get(url, proxies=proxy_dict, timeout=10).content

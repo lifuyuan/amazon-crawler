@@ -108,7 +108,7 @@ def crawl_images():
         helpers.log("WARNING: No URLs found in the queue.")
         # pile.spawn(crawl_images)
         return
-    proxy_dict = helpers.get_proxy()
+    # proxy_dict = helpers.get_proxy()
 
     try:
         dir_name = re.match("(.*/)*", path).group(1)
@@ -124,6 +124,7 @@ def crawl_images():
             f.write(content)
     except Exception as e:
         helpers.log(e)
+        pile.spawn(crawl_images)
         return
     pile.spawn(crawl_images)
 

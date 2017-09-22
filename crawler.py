@@ -59,7 +59,13 @@ def crawl_items():
     product = Product(
         category="node",
         list_url=url,
-        crawl_time=datetime.now()
+        crawl_time=datetime.now(),
+        asin="",
+        title="",
+        product_url="",
+        price="",
+        img_url="",
+        img_path=""
     )
     product.save()
     page, html = helpers.make_request(url)

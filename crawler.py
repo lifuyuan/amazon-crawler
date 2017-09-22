@@ -110,7 +110,7 @@ def crawl_images():
     proxy_dict = helpers.get_proxy()
 
     try:
-        dir_name = re.match("(.*/)*", path).group(0)
+        dir_name = re.match("(.*/)*", path).group(1)
         if not os.path.exists(dir_name):
             os.makedirs(dir_name)
         if proxy_dict:

@@ -58,6 +58,10 @@ def crawl_items():
     page, html = helpers.make_request(url)
     if not page:
         return
+    next_link_tag = page.select("a#pagnNextLink")
+    if next_link_tag:
+        helpers.log(" Found 'Next' link on {}: {}".format(url, next_link_tag[0]["href"]))
+        helpers.enqueue_items_url(next_link_tag[0]["href"])
     items = page.select('.s-result-list li.s-result-item')
     category = extractors.get_category(page)
     for item in items:
@@ -80,11 +84,7 @@ def crawl_items():
             crawl_time=datetime.now()
         )
         product.save()
-    next_link_tag = page.select("a#pagnNextLink")
-    if next_link_tag:
-        helpers.log(" Found 'Next' link on {}: {}".format(url, next_link_tag[0]["href"]))
-        helpers.enqueue_items_url(next_link_tag[0]["href"])
-        pile.spawn(crawl_items)
+    pile.spawn(crawl_items)
 
 
 # 商品图片获取

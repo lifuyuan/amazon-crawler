@@ -8,6 +8,7 @@ from models import Product, conn, cursor
 import re
 import requests
 import os
+import random
 
 crawl_time = datetime.now()
 
@@ -113,14 +114,17 @@ def crawl_images():
         dir_name = re.match("(.*/)*", path).group(1)
         if not os.path.exists(dir_name):
             os.makedirs(dir_name)
-        if proxy_dict:
-            content = requests.get(url, proxies=proxy_dict, timeout=10).content
-        else:
-            content = requests.get(url, timeout=10).content
+        #if proxy_dict:
+        #    content = requests.get(url, proxies=proxy_dict, timeout=10).content
+        #else:
+        headers = settings.headers
+        headers["User-Agent"] = random.choice(settings.agents)
+        content = requests.get(url, headers=headers, timeout=30).content
         with open(path, "wb") as f:
             f.write(content)
     except Exception as e:
         helpers.log(e)
+        return
     pile.spawn(crawl_images)
 
 if __name__ == "__main__":

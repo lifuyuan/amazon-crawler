@@ -108,24 +108,21 @@ def crawl_images():
         helpers.log("WARNING: No URLs found in the queue.")
         # pile.spawn(crawl_images)
         return
-    # proxy_dict = helpers.get_proxy()
-
+    proxy_dict = helpers.get_proxy()
+    headers = settings.headers
+    headers["User-Agent"] = random.choice(settings.agents)
     try:
         dir_name = re.match("(.*/)*", path).group(1)
         if not os.path.exists(dir_name):
             os.makedirs(dir_name)
-        #if proxy_dict:
-        #    content = requests.get(url, proxies=proxy_dict, timeout=10).content
-        #else:
-        headers = settings.headers
-        headers["User-Agent"] = random.choice(settings.agents)
-        content = requests.get(url, headers=headers, timeout=60).content
+        if proxy_dict:
+            content = requests.get(url, headers=headers, proxies=proxy_dict, timeout=60).content
+        else:
+            content = requests.get(url, headers=headers, timeout=60).content
         with open(path, "wb") as f:
             f.write(content)
     except Exception as e:
         helpers.log(e)
-        pile.spawn(crawl_images)
-        return
     pile.spawn(crawl_images)
 
 if __name__ == "__main__":

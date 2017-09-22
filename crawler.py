@@ -28,8 +28,8 @@ def init_crawl():
 def crawl_categories():
     url = helpers.dequeue_categories_url()
     if not url:
-        helpers.log("WARNING: No URLs found in the queue. Retrying...")
-        pile.spawn(crawl_categories)
+        helpers.log("WARNING: No URLs found in the queue")
+        # pile.spawn(crawl_categories)
         return
     page, html = helpers.make_request(url)
     if not page:
@@ -91,8 +91,8 @@ def crawl_items():
 def crawl_images():
     path, url = helpers.dequeue_images_url()
     if not url:
-        helpers.log("WARNING: No URLs found in the queue. Retrying...")
-        pile.spawn(crawl_images)
+        helpers.log("WARNING: No URLs found in the queue.")
+        # pile.spawn(crawl_images)
         return
     proxy_dict = helpers.get_proxy()
     try:

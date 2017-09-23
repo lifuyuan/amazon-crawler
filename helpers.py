@@ -51,7 +51,7 @@ def make_request(url, return_soup=True):
 
     if return_soup:
         return BeautifulSoup(r.text, "lxml"), r.text
-    return r
+    return r, r
 
 
 def format_url(url):

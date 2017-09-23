@@ -112,7 +112,7 @@ def crawl_images():
         dir_name = re.match("(.*/)*", path).group(1)
         if not os.path.exists(dir_name):
             os.makedirs(dir_name)
-        r = helpers.make_request(url, False)
+        r = helpers.make_request(url, False)[0]
         if r:
             with open(path, "wb") as f:
                 f.write(r.content)

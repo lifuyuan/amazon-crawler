@@ -41,7 +41,7 @@ def make_request(url, return_soup=True):
     except RequestException as e:
         log("WARNING: Request for {} failed. Retrying.....{} times".format(url, trying_times+1))
         redis.sadd(url, str(trying_times+1))
-        return make_request(url)
+        return make_request(url, return_soup)
 
     num_requests += 1
     if r.status_code != 200:

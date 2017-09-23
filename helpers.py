@@ -32,11 +32,12 @@ def make_request(url, return_soup=True):
     headers = settings.headers
     headers["User-Agent"] = random.choice(settings.agents)
     proxy_dict = get_proxy()
+    timeout = 20 if return_soup else 60
     try:
         if proxy_dict:
-            r = requests.get(url, headers=headers, proxies=proxy_dict, timeout=20)
+            r = requests.get(url, headers=headers, proxies=proxy_dict, timeout=timeout)
         else:
-            r = requests.get(url, headers=headers, timeout=20)
+            r = requests.get(url, headers=headers, timeout=timeout)
     except RequestException as e:
         log("WARNING: Request for {} failed. Retrying.....{} times".format(url, trying_times+1))
         redis.sadd(url, str(trying_times+1))

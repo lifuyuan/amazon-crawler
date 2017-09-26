@@ -1,4 +1,3 @@
-from twisted.enterprise import adbapi
 import psycopg2
 
 import settings
@@ -36,7 +35,7 @@ class Product(object):
         self.crawl_time = crawl_time
 
     def save(self):
-        insert_sql = "INSERT INTO products(category, asin, title, product_url, list_url, price,\
+        insert_sql = "INSERT INTO spec_products(category, asin, title, product_url, list_url, price,\
                 img_url, img_path, crawl_time) values (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
         # helpers.log(insert_sql)
         try:

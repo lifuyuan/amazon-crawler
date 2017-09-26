@@ -1,8 +1,7 @@
 from html.parser import HTMLParser
 import html
 from helpers import format_url, enqueue_images_url
-import requests
-import os
+import re
 
 htmlparser = HTMLParser()
 
@@ -96,11 +95,11 @@ def get_primary_img(item):
 
 def download_img(url, category, asin):
     dir_name = "images/{}".format(category)
-    #if not os.path.exists(dir_name):
-    #    os.makedirs(dir_name)
-    path = "{}/{}.jpg".format(dir_name, asin)
-    #with open(path, "wb") as f:
-    #    f.write(requests.get(url).content)
+    try:
+        file_type = re.match(".*([.].*)", url).group(1)
+    except Exception as e:
+        file_type = ".jpg"
+    path = "{}/{}{}".format(dir_name, asin, file_type)
     # 异步获取图片
     enqueue_images_url(url, path)
     return path

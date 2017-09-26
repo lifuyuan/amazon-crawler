@@ -167,3 +167,22 @@ def dequeue_proxy_url():
         url = url.decode()
     return url
 
+
+def backup_categories_url():
+    with open("categories_url.txt", "w") as f:
+        while True:
+            url = dequeue_categories_url()
+            if url:
+                print(url, file=f)
+            else:
+                break
+
+
+def backup_items_url():
+    with open("items_url.txt", "w") as f:
+        while True:
+            url = dequeue_items_url()
+            if url:
+                print(url, file=f)
+            else:
+                break

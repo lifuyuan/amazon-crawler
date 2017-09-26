@@ -18,12 +18,20 @@ pile = eventlet.GreenPile(pool)
 
 # 初始化爬虫
 def init_crawl():
+    '''
     start_url = "https://www.amazon.com/gp/site-directory/ref=nav_shopall_btn"
     page, html = helpers.make_request(start_url)
     if not page:
         return
     for tag in page.select('.fsdDeptCol a'):
         helpers.enqueue_categories_url(tag['href'])
+    '''
+    with open("backup_url/start_urls.txt", "r") as f:
+        for line in f:
+            line = line.strip()
+            if not line or line.startswith("#"):
+                continue
+            helpers.enqueue_categories_url(line)
 
 
 # 目录爬取

@@ -63,7 +63,7 @@ def crawl_items():
     url = helpers.dequeue_items_url()
     if not url:
         helpers.log("WARNING: No URLs found in the queue. Retrying...")
-        pile.spawn(crawl_items)
+        # pile.spawn(crawl_items)
         return
     product = Product(
         category="node",

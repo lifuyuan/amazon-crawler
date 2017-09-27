@@ -144,8 +144,8 @@ if __name__ == "__main__":
         helpers.log("Beginning crawl items at {}".format(crawl_time))
         [pile.spawn(crawl_items) for _ in range(settings.max_threads)]
         pool.waitall()
-        cursor.close()
-        conn.close()
+        # cursor.close()
+        # conn.close()
 
     if len(sys.argv) > 1 and sys.argv[1] == "images":
         [pile.spawn(crawl_images) for _ in range(settings.max_threads)]
